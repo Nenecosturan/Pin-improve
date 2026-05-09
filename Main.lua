@@ -21,8 +21,8 @@ local Window = Rayfield:CreateWindow({
 local Tab = Window:CreateTab("Sunucu ve İstatistik", 4483362458)
 
 Tab:CreateParagraph({
-    Title = "bölgem doğrumu ve yönlendirildiğim sunucular gerçekten ping düşüşü sağlarmı?", 
-    Content = "Roblox, sunucuların bulunduğu ülkeleri gizler. Bu yüzden proxy hatalarıyla uğraşmak yerine, sunucunun gerçek pingini analiz edip kıtasını tahmin ediyoruz ve eğer avrupa dışı ülkelerdeyseniz pinginizin artma ihtimali azalmasından daha fazladır."
+    Title = "yönlendirildiğim sunucular ping düşüşü sağlarmı?", 
+    Content = "Hem evet hem hayır, Roblox, sunucuların bulunduğu ülkeleri gizler. Bu yüzden proxy hatalarıyla uğraşmak yerine, sunucunun gerçek pingini analiz edip kıtasını tahmin ediyoruz ve eğer avrupa dışı ülkelerdeyseniz pinginizin artma ihtimali azalmasından daha fazladır."
 })
 
 -- ==========================================
@@ -42,11 +42,11 @@ task.spawn(function()
             
             -- Ping değerine göre kıta tahmini (Fizik kurallarına dayanır)
             if ping < 90 then
-                StatusLabel:Set("Bölge: AVRUPA Sunucusu🟢")
-            elseif ping >= 150 and ping < 300 then
-                StatusLabel:Set("Bölge: AVRUPA Dışı veya uzak Sunucu🟡")
+                StatusLabel:Set("Bölge: •AVRUPA Sunucusu🟢")
+            elseif ping >= 100 and ping < 160 then
+                StatusLabel:Set("Bölge: -Ping dalgalanması-🟡")
             else
-                StatusLabel:Set("Bölge: Çok Uzak Sunucu!🔴")
+                StatusLabel:Set("Bölge: •Dalgalanma veya Çok Uzak Sunucu!🔴")
             end
         end
     end
