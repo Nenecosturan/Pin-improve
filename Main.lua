@@ -1,7 +1,6 @@
 -- ping gelistirici script deneme surumu 2.0 ==========================================
 -- 0. AUTO-EXECUTE (PEŞİMİZİ BIRAKMAYAN SCRIPT)
 -- ==========================================
--- Işınlandığında scriptin otomatik olarak tekrar çalışmasını sağlar.
 local scriptSource = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/Nenecosturan/Pin-improve/main/Main.lua'))()]]
 if queue_on_teleport then
     queue_on_teleport(scriptSource)
@@ -32,7 +31,6 @@ local function ForceRegionHop(targetRegionName)
     if success and result.data then
         local foundServer = nil
         for _, server in ipairs(result.data) do
-            -- Mevcut sunucudan farklı ve boş yeri olan sunucuyu ara
             if server.id ~= game.JobId and server.playing < server.maxPlayers then
                 foundServer = server.id
                 break
@@ -43,7 +41,6 @@ local function ForceRegionHop(targetRegionName)
             Rayfield:Notify({Title = "Success!", Content = "Connecting To The Route...", Duration = 3})
             TeleportService:TeleportToPlaceInstance(PlaceId, foundServer, LocalPlayer)
         else
-            -- EĞER FARKLI SUNUCU BULUNAMAZSA (DESTEKLENMİYOR DEMEKTİR)
             Rayfield:Notify({
                 Title = "❌UNSUPPORTED ROUTE❌", 
                 Content = "Sorry!, " .. targetRegionName .. " route is not avaible for this game,try another route.", 
@@ -62,7 +59,7 @@ local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect |-ZENITH-",
     LoadingTitle = "ANALYZING SOURCE...",
     LoadingSubtitle = "Loading Sources",
-    Theme = "DarkBlue", -- İstediğin o koyu mavi tema!
+    Theme = "DarkBlue", 
     ConfigurationSaving = { Enabled = false }
 })
 
@@ -72,6 +69,7 @@ local TabBrowser = Window:CreateTab("Server Browser", 6031280951)
 local TabSupport = Window:CreateTab("Game Info & Version", 6031154887)
 local TabSettings = Window:CreateTab("Ayarlar", 6031280793)
 local TabBackup = Window:CreateTab("Backup Script", 6034287525)
+
 -- ==========================================
 -- 4. SMART CONNECT & CANLI PİNG
 -- ==========================================
@@ -81,7 +79,8 @@ task.spawn(function()
     while task.wait(1) do
         pcall(function()
             local ping = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-            local color = ping < 61 and "🔵" or ping < 100 and "🟢" or ping < 150 and "🟡" or ping < 200 and "🔴)
+            -- BURADA TIRNAK HATASI DÜZELTİLDİ VE VARSAYILAN DEĞER EKLENDİ
+            local color = (ping < 61 and "🔵") or (ping < 100 and "🟢") or (ping < 150 and "🟡") or (ping < 200 and "🔴") or "💀"
             PingLabel:Set("Live Ping: " .. ping .. " ms | Quality: " .. color)
         end)
     end
@@ -125,8 +124,7 @@ TabBrowser:CreateButton({
                             Rayfield:Notify({Title = "Full!", Content = "Server is full, Roblox will get you on line.", Duration = 3})
                         end
                         TeleportService:TeleportToPlaceInstance(PlaceId, v.id, LocalPlayer)
-                    
-                        end
+                    end
                 })
             end
         end
@@ -138,7 +136,7 @@ TabBrowser:CreateButton({
 -- ==========================================
 TabSupport:CreateParagraph({
     Title = "Game Info & version", 
-    Content = "Current Game ID: " .. PlaceId .. "\nVersion:2.5"
+    Content = "Current Game ID: " .. PlaceId .. "\nVersion: 2.5"
 })
 
 TabSettings:CreateToggle({
@@ -165,6 +163,7 @@ TabSettings:CreateSlider({
         settings().Rendering.QualityLevel = Value
     end
 })
+
 -- ==========================================
 -- 8. YEDEK SİSTEM (CUSTOM UI BACKUP)
 -- ==========================================
@@ -182,7 +181,6 @@ TabBackup:CreateButton({
             Duration = 3
         })
         
-        -- Senin verdiğin Raw linkini çalıştıran komut (Rayfield'ı kapatmaz)
         local success, err = pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/Nenecosturan/Ping-Optimizer-PIOP-/refs/heads/main/Main.lua"))()
         end)
@@ -190,7 +188,13 @@ TabBackup:CreateButton({
         if not success then
             Rayfield:Notify({
                 Title = "Error While Loading!", 
-                Content = "ESTIMATED REASON:Script might be deleted & the RAW link might doesnt work anymore & Script might be under development " .. tostring(err), 
+                Content = "REASON: " .. tostring(err), 
+                Duration = 9
+            })
+        end
+    end
+})
+. tostring(err), 
                 Duration = 9.5
             })
         end
