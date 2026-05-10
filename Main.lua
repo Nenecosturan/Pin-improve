@@ -21,7 +21,7 @@ local PlaceId = game.PlaceId
 -- 2. GELİŞMİŞ BYPASS VE BÖLGE KONTROL FONKSİYONU
 -- ==========================================
 local function ForceRegionHop(targetRegionName)
-    Rayfield:Notify({Title = "Server Check...", Content = targetRegionName .. " route being scanned...", Duration = 3})
+    Rayfield:Notify({Title = "Server Check...", Content = targetRegionName .. "route being scanned...", Duration = 3})
     
     local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
     local success, result = pcall(function()
