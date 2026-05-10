@@ -18,7 +18,8 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "Bölgesel Sunucu Filtresi",
     Theme = { TextColor = Color3.fromRGB(240, 240, 240), 
             Background = Color3.fromRGB(25, 25, 25), 
-            Topbar = Color3.fromRGB(34, 34, 34) },
+            Topbar = Color3.fromRGB(34, 34, 34) 
+        },
     ConfigurationSaving = { Enabled = false }
 })
 
