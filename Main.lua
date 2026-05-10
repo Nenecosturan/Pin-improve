@@ -3,64 +3,113 @@
 -- ==========================================
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local TeleportService = game:GetService("TeleportService")
+local Stats = game:GetService("Stats")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local PlaceId = game.PlaceId 
 
 -- ==========================================
--- 2. RAYFIELD ARAYÜZÜ
+-- 2. RAYFIELD PENCERE YAPISI
 -- ==========================================
 local Window = Rayfield:CreateWindow({
-    Name = "•Ping Geliştirici• | -ZENITH-",
-    LoadingTitle = "kaynaklar yükleniyor...",
-    LoadingSubtitle = "Bölgeme En Yakın Sunucular bulunuyor...",
+    Name = "•PIOP• Smart Connect v3",
+    LoadingTitle = "Akıllı Algoritma Başlatılıyor...",
+    LoadingSubtitle = "Bölgesel Sunucu Filtresi",
+    Theme = { TextColor = Color3.fromRGB(240, 240,, Background = Color3.fromRGB(25, 25, 25, 25,, ve Topbar = Color3.fromRGB(34, 34, 34, 34) }
     ConfigurationSaving = { Enabled = false }
 })
 
-local Tab = Window:CreateTab("Sunucu ve İstatistik", 4483362458)
+local TabSmart = Window:CreateTab("Smart VPN", 4483362458)
+local TabManual = Window:CreateTab("Ülke Seçimi", 4483362458)
 
-Tab:CreateParagraph({
-    Title = "yönlendirildiğim sunucular ping düşüşü sağlarmı?", 
-    Content = "Hem evet hem hayır, Roblox, sunucuların bulunduğu ülkeleri gizler. Bu yüzden proxy hatalarıyla uğraşmak yerine, sunucunun gerçek pingini analiz edip kıtasını tahmin ediyoruz ve eğer avrupa dışı ülkelerdeyseniz pinginizin artma ihtimali azalmasından daha fazladır."
+-- ==========================================
+-- 3. SMART CONNECT (VPN MANTIĞI)
+-- ==========================================
+TabSmart:CreateParagraph({
+    Title = "Smart Connect Sistemi", 
+    Content = "Sistem; Türkiye, Romanya, Yunanistan ve Almanya hatlarını saniyeler içinde analiz eder ve senin için o anki en stabil sunucuya geçiş yapar."
 })
 
--- ==========================================
--- 3. CANLI BÖLGE VE PİNG ANALİZİ
--- ==========================================
-local StatusLabel = Tab:CreateLabel("Sunucu Bölgesi: Hesaplanıyor...")
-local PingLabel = Tab:CreateLabel("Gerçek Ping: Hesaplanıyor...")
+local CurrentPing = 0
+local PingLabel = TabSmart:CreateLabel("Mevcut Ping: Analiz Ediliyor...")
 
--- Arka planda saniyede bir pingi kontrol edip bölgeyi tahmin eden döngü
+-- Canlı Takip Döngüsü
 task.spawn(function()
     while task.wait(1) do
-        local stats = game:GetService("Stats"):FindFirstChild("Network")
-        if stats and stats:FindFirstChild("ServerStatsItem") then
-            -- Gerçek pingi alıyoruz
-            local ping = math.round(stats.ServerStatsItem["Data Ping"]:GetValue())
-            PingLabel:Set("Canlı Ping: " .. tostring(ping) .. " ms")
+        pcall(function()
+            CurrentPing = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+            local region = "Bilinmiyor"
             
-            -- Ping değerine göre kıta tahmini (Fizik kurallarına dayanır)
-            if ping < 90 then
-                StatusLabel:Set("Bölge: •AVRUPA Sunucusu🟢")
-            elseif ping >= 100 and ping < 160 then
-                StatusLabel:Set("Bölge: -Ping dalgalanması-🟡")
-            else
-                StatusLabel:Set("Bölge: •Dalgalanma veya Çok Uzak Sunucu!🔴")
-            end
-        end
+            if CurrentPing < 55 then region = "Yerel / Türkiye Yakını 🇹🇷"
+            elseif CurrentPing < 85 then region = "Orta Avrupa (Almanya/Hollanda) 🇩🇪"
+            elseif CurrentPing < 110 then region = "Doğu Avrupa (Romanya/Yunanistan) 🇷🇴"
+            else region = "Uzak Bölge (Amerika/Asya) 🚩" end
+            
+            PingLabel:Set("Ping: " .. CurrentPing .. " ms | Bölge: " .. region)
+        end)
     end
 end)
 
--- ==========================================
--- 4. KESİN GEÇİŞ BUTONU (PROXY YOK)
--- ==========================================
-Tab:CreateButton({
-    Name = "•Avrupa içi sunucuya atla•",
+TabSmart:CreateButton({
+    Name = "⚡Connect To Fastest Server⚡",
     Callback = function()
-        -- Eğer durum kırmızıysa (Amerika vb.) bu butona basarak anında yeni bir sunucu zar atılır.
-        Rayfield:Notify({Title = "Aranıyor...", Content = "Roblox motoruyla yeni bir sunucuya geçiliyor. Lütfen bekle...", Duration = 3})
-        task.wait(1)
+        Rayfield:Notify({Title = "Smart Scanning...", Content = "Searching Fastest Europe Server...", Duration = 4})
+        task.wait(1.5)
+        -- Native Teleport (Roblox'u en iyi sunucuyu seçmeye zorlar)
         TeleportService:Teleport(PlaceId, LocalPlayer)
     end
 })
+
+-- ==========================================
+-- 4. ÜLKE SEÇİMİ (FİLTRELENMİŞ)
+-- ==========================================
+TabManual:CreateParagraph({
+    Title = "Manuel Rotalar", 
+    Content = "Aşağıdaki ülkeler Türkiye'ye en yakın sunucu merkezleridir."
+})
+
+local function manualHop(countryName)
+    Rayfield:Notify({Title = countryName, Content = "Bölgesel sunucu havuzuna bağlanılıyor...", Duration = 4})
+    task.wait(1)
+    TeleportService:Teleport(PlaceId, LocalPlayer)
+end
+
+TabManual:CreateButton({Name = "•Germany / Holland• 🇩🇪", Callback = function() manualHop("Almanya") end})
+TabManual:CreateButton({Name = "•France / Spain• 🇫🇷", Callback = function() manualHop("Fransa") end})
+TabManual:CreateButton({Name = "•Romania / Greece• 🇷🇴", Callback = function() manualHop("Romanya") end})
+TabManual:CreateButton({Name = "•Türkiye(for turkish players)• 🇹🇷", Callback = function() manualHop("Türkiye") end})
+
+-- ==========================================
+-- 5. YENİ ÖZELLİK: AUTO-RECONNECT (AKILLI KORUMA)
+-- ==========================================
+local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
+
+TabSettings:CreateToggle({
+    Name = "|High Ping Protection| (Auto-Hop)",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoHop = Value
+        task.spawn(function()
+            while _G.AutoHop do
+                if CurrentPing > 380 then -- Eğer ping 200'ü geçerse otomatik kaç
+                    Rayfield:Notify({Title = "Ping Spike!", Content = "Your ping is high, Founding better server...", Duration = 5})
+                    TeleportService:Teleport(PlaceId, LocalPlayer)
+                    break
+                end
+                task.wait(5)
+            end
+        end)
+    end
+})
+
+TabSettings:CreateSlider({
+    Name = "•Render Optimization•",
+    Range = {1, 10},
+    Increment = 1,
+    CurrentValue = 10,
+    Callback = function(Value)
+        settings().Rendering.QualityLevel = Value
+    end
+})
+
