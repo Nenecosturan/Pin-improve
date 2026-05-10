@@ -1,4 +1,13 @@
---Ping improve scripti(deneme sürümü) ==========================================
+-- ping gelistirici script deneme surumu 2.0 ==========================================
+-- 0. AUTO-EXECUTE (PEŞİMİZİ BIRAKMAYAN SCRIPT)
+-- ==========================================
+-- Işınlandığında scriptin otomatik olarak tekrar çalışmasını sağlar.
+local scriptSource = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/Nenecosturan/Pin-improve/main/Main.lua'))()]]
+if queue_on_teleport then
+    queue_on_teleport(scriptSource)
+end
+
+-- ==========================================
 -- 1. KÜTÜPHANE VE SERVİSLER
 -- ==========================================
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -13,7 +22,7 @@ local PlaceId = game.PlaceId
 -- 2. GELİŞMİŞ BYPASS VE BÖLGE KONTROL FONKSİYONU
 -- ==========================================
 local function ForceRegionHop(targetRegionName)
-    Rayfield:Notify({Title = "Region Bypass", Content = targetRegionName .. " için sunucu taranıyor...", Duration = 3})
+    Rayfield:Notify({Title = "Bölge Kontrolü", Content = targetRegionName .. " rotası taranıyor...", Duration = 3})
     
     local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
     local success, result = pcall(function()
@@ -23,7 +32,7 @@ local function ForceRegionHop(targetRegionName)
     if success and result.data then
         local foundServer = nil
         for _, server in ipairs(result.data) do
-            -- Kendi sunucumuzdan farklı ve kapasitesi olan sunucuyu zorla seç (Bypass)
+            -- Mevcut sunucudan farklı ve boş yeri olan sunucuyu ara
             if server.id ~= game.JobId and server.playing < server.maxPlayers then
                 foundServer = server.id
                 break
@@ -31,13 +40,14 @@ local function ForceRegionHop(targetRegionName)
         end
 
         if foundServer then
-            Rayfield:Notify({Title = "Success!", Content = "Hedef bölgeye zorla giriş yapılıyor...", Duration = 3})
+            Rayfield:Notify({Title = "Success!", Content = "Hedef bölgeye zorunlu geçiş yapılıyor...", Duration = 3})
             TeleportService:TeleportToPlaceInstance(PlaceId, foundServer, LocalPlayer)
         else
+            -- EĞER FARKLI SUNUCU BULUNAMAZSA (DESTEKLENMİYOR DEMEKTİR)
             Rayfield:Notify({
-                Title = "Bölge Desteklenmiyor", 
-                Content = "Oyun bu manuel bölgeyi şu an desteklemiyor. Lütfen başka bir rota deneyin!", 
-                Duration = 5
+                Title = "❌ Bölge Desteklenmiyor", 
+                Content = "Üzgünüm dostum, " .. targetRegionName .. " rotası bu oyunda şu an mevcut değil. Lütfen başka bir rota deneyin!", 
+                Duration = 6
             })
         end
     else
@@ -51,8 +61,8 @@ end
 local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect |-ZENITH-",
     LoadingTitle = "BYPASSING PROTOCOLS...",
-    LoadingSubtitle = "Regional Lock Override Active",
-    Theme = "Ocean", 
+    LoadingSubtitle = "Persistent Script Mode Active",
+    Theme = "DarkBlue", -- İstediğin o koyu mavi tema!
     ConfigurationSaving = { Enabled = false }
 })
 
@@ -85,22 +95,20 @@ TabSmart:CreateButton({
 })
 
 -- ==========================================
--- 5. MANUEL ROUTES (ZORUNLU GİRİŞ)
+-- 5. MANUEL ROUTES (HATA MESAJLI BYPASS)
 -- ==========================================
-TabManual:CreateButton({Name = "• Germany / Holland • 🇩🇪", Callback = function() ForceRegionHop("Germany-Holland") end})
-TabManual:CreateButton({Name = "• France / Spain • 🇫🇷", Callback = function() ForceRegionHop("France-Spain") end})
-TabManual:CreateButton({Name = "• Romania / Greece • 🇷🇴", Callback = function() ForceRegionHop("Romania-Greece") end})
+TabManual:CreateButton({Name = "• Germany / Holland • 🇩🇪", Callback = function() ForceRegionHop("Almanya") end})
+TabManual:CreateButton({Name = "• France / Spain • 🇫🇷", Callback = function() ForceRegionHop("Fransa") end})
+TabManual:CreateButton({Name = "• Romania / Greece • 🇷🇴", Callback = function() ForceRegionHop("Romanya") end})
 
 -- ==========================================
--- 6. SERVER BROWSER (KAPASİTE VE YENİLEME EKLENDİ)
+-- 6. SERVER BROWSER (KAPASİTE VE YENİLEME)
 -- ==========================================
 TabBrowser:CreateButton({
     Name = "🔄 SCAN & REFRESH SERVERS",
     Callback = function()
         Rayfield:Notify({Title = "Scanning...", Content = "Sunucu kapasiteleri inceleniyor...", Duration = 2})
-        
         local success, result = pcall(function()
-            -- limit=10 yaparak o anki en aktif 10 sunucuyu çekiyoruz
             return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Asc&limit=10"))
         end)
 
@@ -108,11 +116,10 @@ TabBrowser:CreateButton({
             for i, v in ipairs(result.data) do
                 local current = v.playing
                 local max = v.maxPlayers
-                local statusEmoji = current >= max and "🔴 FULL" or "🟢 JOIN"
+                local status = current >= max and "🔴 FULL" or "🟢 JOIN"
                 
-                -- Buton ismi artık kapasiteyi gösteriyor: Server #1 | 👥 48/50 [🟢 JOIN]
                 TabBrowser:CreateButton({
-                    Name = "Server #"..i.." | 👥 " .. current .. "/" .. max .. " [" .. statusEmoji .. "]",
+                    Name = "Server #"..i.." | 👥 " .. current .. "/" .. max .. " [" .. status .. "]",
                     Callback = function()
                         if current >= max then
                             Rayfield:Notify({Title = "Dolu!", Content = "Sunucu dolu, Roblox sizi sıraya alabilir.", Duration = 3})
@@ -130,7 +137,7 @@ TabBrowser:CreateButton({
 -- ==========================================
 TabSupport:CreateParagraph({
     Title = "Region Support Info", 
-    Content = "Current Game ID: " .. PlaceId .. "\nStatus: Secure Bypass Active\nRoblox sunucu bölgelerini dinamik olarak atar."
+    Content = "Current Game ID: " .. PlaceId .. "\nStatus: Secure Bypass Active\nSunucu bulunamazsa 'Bölge Desteklenmiyor' uyarısı alırsınız."
 })
 
 TabSettings:CreateToggle({
