@@ -16,7 +16,7 @@ local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Smart Connect v3",
     LoadingTitle = "Akıllı Algoritma Başlatılıyor...",
     LoadingSubtitle = "Bölgesel Sunucu Filtresi",
-    Theme = { TextColor = Color3.fromRGB(240, 240, 240,) Background = Color3.fromRGB(25, 25, 25,) ve Topbar = Color3.fromRGB(34, 34, 34,) },
+    Theme = { TextColor = Color3.fromRGB(240, 240, 240), Background = Color3.fromRGB(25, 25, 25), ve Topbar = Color3.fromRGB(34, 34, 34) },
     ConfigurationSaving = { Enabled = false }
 })
 
