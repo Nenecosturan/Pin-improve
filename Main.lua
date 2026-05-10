@@ -20,7 +20,7 @@ local Window = Rayfield:CreateWindow({
         TextColor = Color3.fromRGB(240, 240, 240), 
         Background = Color3.fromRGB(25, 25, 25), 
         Topbar = Color3.fromRGB(34, 34, 34) 
-    },
+    }, -- Tema bloğu düzeltildi
     ConfigurationSaving = { Enabled = false }
 })
 
@@ -32,11 +32,11 @@ local TabManual = Window:CreateTab("Manuel Connection", 4483362458)
 -- ==========================================
 TabSmart:CreateParagraph({
     Title = "About Smart Connect", 
-    Content = "Smart connect analyzes your country from calculations and connects you into the best server."
-}) -- BURADA KAPATMAYI UNUTMUŞTUN, DÜZELTTİM.
+    Content = "Smart connect analyzes your country with calculations and connects you into the best server."
+}) -- BURADAKİ KAPATMA EKSİKTİ, DÜZELTİLDİ.
 
 TabSmart:CreateParagraph({
-    Title = "Possible Errors", -- BURAYA VİRGÜL EKLEDİM.
+    Title = "Possible Errors", -- BURAYA VİRGÜL EKLENDİ.
     Content = "Because of Roblox's strict safety rules, this script may have some errors"         
 })
 
@@ -89,7 +89,7 @@ TabManual:CreateButton({Name = "•Romania / Greece• 🇷🇴", Callback = fun
 TabManual:CreateButton({Name = "•Türkiye(for turkish players)• 🇹🇷", Callback = function() manualHop("Türkiye") end})
 
 -- ==========================================
--- 5. YENİ ÖZELLİK: AUTO-RECONNECT (AKILLI KORUMA)
+-- 5. AYARLAR VE EK ÖZELLİKLER
 -- ==========================================
 local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
 
@@ -111,9 +111,10 @@ TabSettings:CreateToggle({
     end
 })
 
+-- BU PARAGRAFI TABSMART İÇİNE DÜZGÜNCE YERLEŞTİRDİM VE VİRGÜLLERİNİ KOYDUM
 TabSmart:CreateParagraph({
-    Title = "Auto-Hop may be frustrating sometimes", -- VİRGÜL VE METİN DÜZENLENDİ.
-    Content = "Turn it off unless you have good connection"
+    Title = "Auto-Hop Warning", 
+    Content = "Turn it off unless you have good connection. It might hop mid-game!"
 })   
 
 TabSettings:CreateSlider({
