@@ -16,7 +16,7 @@ local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect|-ZENITH- ",
     LoadingTitle = "SERVERS LOADING...",
     LoadingSubtitle = "Checking player information...",
-    "Theme = Ocean"
+    "Theme = Ocean",
     ConfigurationSaving = { Enabled = false }
 })
 
