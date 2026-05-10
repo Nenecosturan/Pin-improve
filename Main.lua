@@ -13,29 +13,29 @@ local PlaceId = game.PlaceId
 -- 2. RAYFIELD PENCERE YAPISI
 -- ==========================================
 local Window = Rayfield:CreateWindow({
-    Name = "•PIOP• Smart Connect v3",
-    LoadingTitle = "Akıllı Algoritma Başlatılıyor...",
-    LoadingSubtitle = "Bölgesel Sunucu Filtresi",
-    Theme = { TextColor = Color3.fromRGB(240, 240, 240), 
-            Background = Color3.fromRGB(25, 25, 25), 
-            Topbar = Color3.fromRGB(34, 34, 34) 
-        },
+    Name = "•PIOP• Connect|-ZENITH- ",
+    LoadingTitle = "SERVERS LOADING...",
+    LoadingSubtitle = "Checking player information...",
+    "Theme = Ocean"
     ConfigurationSaving = { Enabled = false }
 })
 
-local TabSmart = Window:CreateTab("Smart VPN", 4483362458)
-local TabManual = Window:CreateTab("Ülke Seçimi", 4483362458)
+local TabSmart = Window:CreateTab("Smart Connection", 4483362458)
+local TabManual = Window:CreateTab("Manuel Connection", 4483362458)
 
 -- ==========================================
 -- 3. SMART CONNECT (VPN MANTIĞI)
 -- ==========================================
 TabSmart:CreateParagraph({
-    Title = "Smart Connect Sistemi", 
-    Content = "Sistem; Türkiye, Romanya, Yunanistan ve Almanya hatlarını saniyeler içinde analiz eder ve senin için o anki en stabil sunucuya geçiş yapar."
-})
+    Title = "About Smart Connect", 
+    Content = "Smart connect analyzes first you country from calculations and connects you into the best server."
+TabSmart:CreateParagraph({
+    Title = "Possible Errors"
+    Content = "Because of Roblox's strict safety rules, this script may have some errors"         
+    })
 
 local CurrentPing = 0
-local PingLabel = TabSmart:CreateLabel("Mevcut Ping: Analiz Ediliyor...")
+local PingLabel = TabSmart:CreateLabel("My Ping: Analyzing...")
 
 -- Canlı Takip Döngüsü
 task.spawn(function()
@@ -44,10 +44,10 @@ task.spawn(function()
             CurrentPing = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
             local region = "Bilinmiyor"
             
-            if CurrentPing < 55 then region = "Yerel / Türkiye Yakını 🇹🇷"
-            elseif CurrentPing < 85 then region = "Orta Avrupa (Almanya/Hollanda) 🇩🇪"
-            elseif CurrentPing < 110 then region = "Doğu Avrupa (Romanya/Yunanistan) 🇷🇴"
-            else region = "Uzak Bölge (Amerika/Asya) 🚩" end
+            if CurrentPing < 60 then region = "NEARBY SERVER🔵"
+            elseif CurrentPing < 130 then region = "SLIGHTLY FAR SERVER OR PING SPIKE🟢"
+            elseif CurrentPing < 220 then region = "FAR SERVER OR SERIOUS PING SPIKE🟡"
+            else region = "You're far away from europe!🔴" end
             
             PingLabel:Set("Ping: " .. CurrentPing .. " ms | Bölge: " .. region)
         end)
@@ -68,12 +68,12 @@ TabSmart:CreateButton({
 -- 4. ÜLKE SEÇİMİ (FİLTRELENMİŞ)
 -- ==========================================
 TabManual:CreateParagraph({
-    Title = "Manuel Rotalar", 
-    Content = "Aşağıdaki ülkeler Türkiye'ye en yakın sunucu merkezleridir."
+    Title = "Manuel Routes", 
+    Content = "The countrys above are the most stabile servers for europe."
 })
 
 local function manualHop(countryName)
-    Rayfield:Notify({Title = countryName, Content = "Bölgesel sunucu havuzuna bağlanılıyor...", Duration = 4})
+    Rayfield:Notify({Title = countryName, Content = "Manually Connecting...", Duration = 4})
     task.wait(1)
     TeleportService:Teleport(PlaceId, LocalPlayer)
 end
@@ -89,7 +89,7 @@ TabManual:CreateButton({Name = "•Türkiye(for turkish players)• 🇹🇷", C
 local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
 
 TabSettings:CreateToggle({
-    Name = "|High Ping Protection| (Auto-Hop)",
+    Name = "•|High Ping Protection|• (Auto-Hop)",
     CurrentValue = false,
     Callback = function(Value)
         _G.AutoHop = Value
@@ -105,6 +105,10 @@ TabSettings:CreateToggle({
         end)
     end
 })
+TabSmart:CreateParagraph({
+    Title = "Auto-Hop may be frustrating sometimes example:auto-serverhop mid game"
+    Content = "Turn it off unless you have good connection"
+    })   
 
 TabSettings:CreateSlider({
     Name = "•Render Optimization•",
