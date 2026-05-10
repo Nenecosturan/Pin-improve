@@ -71,7 +71,7 @@ local TabManual = Window:CreateTab("Manual Routes", 4483362458)
 local TabBrowser = Window:CreateTab("Server Browser", 4483362458)
 local TabSupport = Window:CreateTab("Game Support", 4483362458)
 local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
-
+local TabBackup = Window:CreateTab("Backup Script",4483362458)
 -- ==========================================
 -- 4. SMART CONNECT & CANLI PİNG
 -- ==========================================
@@ -125,7 +125,8 @@ TabBrowser:CreateButton({
                             Rayfield:Notify({Title = "Dolu!", Content = "Sunucu dolu, Roblox sizi sıraya alabilir.", Duration = 3})
                         end
                         TeleportService:TeleportToPlaceInstance(PlaceId, v.id, LocalPlayer)
-                    end
+                    
+                        end
                 })
             end
         end
@@ -164,3 +165,35 @@ TabSettings:CreateSlider({
         settings().Rendering.QualityLevel = Value
     end
 })
+-- ==========================================
+-- 8. YEDEK SİSTEM (CUSTOM UI BACKUP)
+-- ==========================================
+TabBackup:CreateParagraph({
+    Title = "Custom UI Backup", 
+    Content = "Ana sistemden bağımsız, kendi özel arayüzümüze (Custom Menu) sahip yedek optimizasyon scriptini buradan başlatabilirsin."
+})
+
+TabBackup:CreateButton({
+    Name = "🚀 Custom Menu Başlat (PIOP- Backup)",
+    Callback = function()
+        Rayfield:Notify({
+            Title = "Yedek Sistem Aktif!", 
+            Content = "Kendi özel menün yükleniyor...", 
+            Duration = 4
+        })
+        
+        -- Senin verdiğin Raw linkini çalıştıran komut (Rayfield'ı kapatmaz)
+        local success, err = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Nenecosturan/Ping-Optimizer-PIOP-/refs/heads/main/Main.lua"))()
+        end)
+        
+        if not success then
+            Rayfield:Notify({
+                Title = "Yükleme Hatası!", 
+                Content = "Script yüklenirken bir sorun oluştu: " .. tostring(err), 
+                Duration = 5
+            })
+        end
+    end
+})
+
