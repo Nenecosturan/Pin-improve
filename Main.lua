@@ -16,11 +16,12 @@ local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect|-ZENITH- ",
     LoadingTitle = "SERVERS LOADING...",
     LoadingSubtitle = "Checking player information...",
-    Theme = { TextColor = Color3.fromRGB(240, 240, 240), 
-            Background = Color3.fromRGB(25, 25, 25), 
-            Topbar = Color3.fromRGB(34, 34, 34) },
-    
-        ConfigurationSaving = { Enabled = false }
+    Theme = { 
+        TextColor = Color3.fromRGB(240, 240, 240), 
+        Background = Color3.fromRGB(25, 25, 25), 
+        Topbar = Color3.fromRGB(34, 34, 34) 
+    },
+    ConfigurationSaving = { Enabled = false }
 })
 
 local TabSmart = Window:CreateTab("Smart Connection", 4483362458)
@@ -31,11 +32,13 @@ local TabManual = Window:CreateTab("Manuel Connection", 4483362458)
 -- ==========================================
 TabSmart:CreateParagraph({
     Title = "About Smart Connect", 
-    Content = "Smart connect analyzes first you country from calculations and connects you into the best server."
+    Content = "Smart connect analyzes your country from calculations and connects you into the best server."
+}) -- BURADA KAPATMAYI UNUTMUŞTUN, DÜZELTTİM.
+
 TabSmart:CreateParagraph({
-    Title = "Possible Errors"
+    Title = "Possible Errors", -- BURAYA VİRGÜL EKLEDİM.
     Content = "Because of Roblox's strict safety rules, this script may have some errors"         
-    })
+})
 
 local CurrentPing = 0
 local PingLabel = TabSmart:CreateLabel("My Ping: Analyzing...")
@@ -62,7 +65,6 @@ TabSmart:CreateButton({
     Callback = function()
         Rayfield:Notify({Title = "Smart Scanning...", Content = "Searching Fastest Europe Server...", Duration = 4})
         task.wait(1.5)
-        -- Native Teleport (Roblox'u en iyi sunucuyu seçmeye zorlar)
         TeleportService:Teleport(PlaceId, LocalPlayer)
     end
 })
@@ -98,7 +100,7 @@ TabSettings:CreateToggle({
         _G.AutoHop = Value
         task.spawn(function()
             while _G.AutoHop do
-                if CurrentPing > 380 then -- Eğer ping 200'ü geçerse otomatik kaç
+                if CurrentPing > 380 then 
                     Rayfield:Notify({Title = "Ping Spike!", Content = "Your ping is high, Founding better server...", Duration = 5})
                     TeleportService:Teleport(PlaceId, LocalPlayer)
                     break
@@ -108,10 +110,11 @@ TabSettings:CreateToggle({
         end)
     end
 })
+
 TabSmart:CreateParagraph({
-    Title = "Auto-Hop may be frustrating sometimes example:auto-serverhop mid game"
+    Title = "Auto-Hop may be frustrating sometimes", -- VİRGÜL VE METİN DÜZENLENDİ.
     Content = "Turn it off unless you have good connection"
-    })   
+})   
 
 TabSettings:CreateSlider({
     Name = "•Render Optimization•",
@@ -122,4 +125,3 @@ TabSettings:CreateSlider({
         settings().Rendering.QualityLevel = Value
     end
 })
-
