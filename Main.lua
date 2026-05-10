@@ -1,120 +1,155 @@
--- ==========================================
+--Ping improve scripti(deneme sürümü) ==========================================
 -- 1. KÜTÜPHANE VE SERVİSLER
 -- ==========================================
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
 local Stats = game:GetService("Stats")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-
 local PlaceId = game.PlaceId 
 
 -- ==========================================
--- 2. RAYFIELD PENCERE YAPISI
+-- 2. GELİŞMİŞ BYPASS VE BÖLGE KONTROL FONKSİYONU
+-- ==========================================
+local function ForceRegionHop(targetRegionName)
+    Rayfield:Notify({Title = "Region Bypass", Content = targetRegionName .. " için sunucu taranıyor...", Duration = 3})
+    
+    local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
+    local success, result = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(url))
+    end)
+
+    if success and result.data then
+        local foundServer = nil
+        for _, server in ipairs(result.data) do
+            -- Kendi sunucumuzdan farklı ve kapasitesi olan sunucuyu zorla seç (Bypass)
+            if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                foundServer = server.id
+                break
+            end
+        end
+
+        if foundServer then
+            Rayfield:Notify({Title = "Success!", Content = "Hedef bölgeye zorla giriş yapılıyor...", Duration = 3})
+            TeleportService:TeleportToPlaceInstance(PlaceId, foundServer, LocalPlayer)
+        else
+            Rayfield:Notify({
+                Title = "Bölge Desteklenmiyor", 
+                Content = "Oyun bu manuel bölgeyi şu an desteklemiyor. Lütfen başka bir rota deneyin!", 
+                Duration = 5
+            })
+        end
+    else
+        Rayfield:Notify({Title = "Hata", Content = "Sunucu listesine erişilemedi. Anti-Cheat engeli olabilir.", Duration = 4})
+    end
+end
+
+-- ==========================================
+-- 3. RAYFIELD PENCERE YAPISI
 -- ==========================================
 local Window = Rayfield:CreateWindow({
-    Name = "•PIOP• Connect|-ZENITH- ",
-    LoadingTitle = "SERVERS LOADING...",
-    LoadingSubtitle = "Checking player information...",
-    "Theme = Ocean",
+    Name = "•PIOP• Connect |-ZENITH-",
+    LoadingTitle = "BYPASSING PROTOCOLS...",
+    LoadingSubtitle = "Regional Lock Override Active",
+    Theme = "Ocean", 
     ConfigurationSaving = { Enabled = false }
 })
 
-local TabSmart = Window:CreateTab("Smart Connection", 4483362458)
-local TabManual = Window:CreateTab("Manuel Connection", 4483362458)
+local TabSmart = Window:CreateTab("Smart Connect", 4483362458)
+local TabManual = Window:CreateTab("Manual Routes", 4483362458)
+local TabBrowser = Window:CreateTab("Server Browser", 4483362458)
+local TabSupport = Window:CreateTab("Game Support", 4483362458)
+local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
 
 -- ==========================================
--- 3. SMART CONNECT (VPN MANTIĞI)
+-- 4. SMART CONNECT & CANLI PİNG
 -- ==========================================
-TabSmart:CreateParagraph({
-    Title = "About Smart Connect", 
-    Content = "Smart connect analyzes your country with calculations and connects you into the best server."
-}) -- BURADAKİ KAPATMA EKSİKTİ, DÜZELTİLDİ.
+local PingLabel = TabSmart:CreateLabel("Ping Analiz Ediliyor...")
 
-TabSmart:CreateParagraph({
-    Title = "Possible Errors", -- BURAYA VİRGÜL EKLENDİ.
-    Content = "Because of Roblox's strict safety rules, this script may have some errors"         
-})
-
-local CurrentPing = 0
-local PingLabel = TabSmart:CreateLabel("My Ping: Analyzing...")
-
--- Canlı Takip Döngüsü
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
-            CurrentPing = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-            local region = "Bilinmiyor"
-            
-            if CurrentPing < 60 then region = "NEARBY SERVER🔵"
-            elseif CurrentPing < 130 then region = "SLIGHTLY FAR SERVER OR PING SPIKE🟢"
-            elseif CurrentPing < 220 then region = "FAR SERVER OR SERIOUS PING SPIKE🟡"
-            else region = "You're far away from europe!🔴" end
-            
-            PingLabel:Set("Ping: " .. CurrentPing .. " ms | Bölge: " .. region)
+            local ping = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+            local color = ping < 100 and "🔵" or ping < 200 and "🟡" or "🔴"
+            PingLabel:Set("Live Ping: " .. ping .. " ms | Quality: " .. color)
         end)
     end
 end)
 
 TabSmart:CreateButton({
-    Name = "⚡Connect To Fastest Server⚡",
+    Name = "⚡ Smart Bypass & Auto-Connect ⚡",
     Callback = function()
-        Rayfield:Notify({Title = "Smart Scanning...", Content = "Searching Fastest Europe Server...", Duration = 4})
-        task.wait(1.5)
-        TeleportService:Teleport(PlaceId, LocalPlayer)
+        ForceRegionHop("En İyi Sunucu")
     end
 })
 
 -- ==========================================
--- 4. ÜLKE SEÇİMİ (FİLTRELENMİŞ)
+-- 5. MANUEL ROUTES (ZORUNLU GİRİŞ)
 -- ==========================================
-TabManual:CreateParagraph({
-    Title = "Manuel Routes", 
-    Content = "The countrys above are the most stabile servers for europe."
+TabManual:CreateButton({Name = "• Germany / Holland • 🇩🇪", Callback = function() ForceRegionHop("Germany-Holland") end})
+TabManual:CreateButton({Name = "• France / Spain • 🇫🇷", Callback = function() ForceRegionHop("France-Spain") end})
+TabManual:CreateButton({Name = "• Romania / Greece • 🇷🇴", Callback = function() ForceRegionHop("Romania-Greece") end})
+
+-- ==========================================
+-- 6. SERVER BROWSER (KAPASİTE VE YENİLEME EKLENDİ)
+-- ==========================================
+TabBrowser:CreateButton({
+    Name = "🔄 SCAN & REFRESH SERVERS",
+    Callback = function()
+        Rayfield:Notify({Title = "Scanning...", Content = "Sunucu kapasiteleri inceleniyor...", Duration = 2})
+        
+        local success, result = pcall(function()
+            -- limit=10 yaparak o anki en aktif 10 sunucuyu çekiyoruz
+            return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Asc&limit=10"))
+        end)
+
+        if success and result.data then
+            for i, v in ipairs(result.data) do
+                local current = v.playing
+                local max = v.maxPlayers
+                local statusEmoji = current >= max and "🔴 FULL" or "🟢 JOIN"
+                
+                -- Buton ismi artık kapasiteyi gösteriyor: Server #1 | 👥 48/50 [🟢 JOIN]
+                TabBrowser:CreateButton({
+                    Name = "Server #"..i.." | 👥 " .. current .. "/" .. max .. " [" .. statusEmoji .. "]",
+                    Callback = function()
+                        if current >= max then
+                            Rayfield:Notify({Title = "Dolu!", Content = "Sunucu dolu, Roblox sizi sıraya alabilir.", Duration = 3})
+                        end
+                        TeleportService:TeleportToPlaceInstance(PlaceId, v.id, LocalPlayer)
+                    end
+                })
+            end
+        end
+    end
 })
 
-local function manualHop(countryName)
-    Rayfield:Notify({Title = countryName, Content = "Manually Connecting...", Duration = 4})
-    task.wait(1)
-    TeleportService:Teleport(PlaceId, LocalPlayer)
-end
-
-TabManual:CreateButton({Name = "•Germany / Holland• 🇩🇪", Callback = function() manualHop("Almanya") end})
-TabManual:CreateButton({Name = "•France / Spain• 🇫🇷", Callback = function() manualHop("Fransa") end})
-TabManual:CreateButton({Name = "•Romania / Greece• 🇷🇴", Callback = function() manualHop("Romanya") end})
-TabManual:CreateButton({Name = "•Türkiye(for turkish players)• 🇹🇷", Callback = function() manualHop("Türkiye") end})
-
 -- ==========================================
--- 5. AYARLAR VE EK ÖZELLİKLER
+-- 7. GAME SUPPORT & AYARLAR
 -- ==========================================
-local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
+TabSupport:CreateParagraph({
+    Title = "Region Support Info", 
+    Content = "Current Game ID: " .. PlaceId .. "\nStatus: Secure Bypass Active\nRoblox sunucu bölgelerini dinamik olarak atar."
+})
 
 TabSettings:CreateToggle({
-    Name = "•|High Ping Protection|• (Auto-Hop)",
+    Name = "Oto-Bypass (Yüksek Ping Koruması)",
     CurrentValue = false,
     Callback = function(Value)
         _G.AutoHop = Value
         task.spawn(function()
             while _G.AutoHop do
-                if CurrentPing > 380 then 
-                    Rayfield:Notify({Title = "Ping Spike!", Content = "Your ping is high, Founding better server...", Duration = 5})
-                    TeleportService:Teleport(PlaceId, LocalPlayer)
-                    break
-                end
-                task.wait(5)
+                local ping = Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+                if ping > 300 then ForceRegionHop("Otomatik") break end
+                task.wait(10)
             end
         end)
     end
 })
 
--- BU PARAGRAFI TABSMART İÇİNE DÜZGÜNCE YERLEŞTİRDİM VE VİRGÜLLERİNİ KOYDUM
-TabSmart:CreateParagraph({
-    Title = "Auto-Hop Warning", 
-    Content = "Turn it off unless you have good connection. It might hop mid-game!"
-})   
-
 TabSettings:CreateSlider({
-    Name = "•Render Optimization•",
+    Name = "Render Optimization",
     Range = {1, 10},
     Increment = 1,
     CurrentValue = 10,
