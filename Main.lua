@@ -16,8 +16,11 @@ local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect|-ZENITH- ",
     LoadingTitle = "SERVERS LOADING...",
     LoadingSubtitle = "Checking player information...",
-    "Theme = DarkBlue",
-    ConfigurationSaving = { Enabled = false }
+    Theme = { TextColor = Color3.fromRGB(240, 240, 240), 
+            Background = Color3.fromRGB(25, 25, 25), 
+            Topbar = Color3.fromRGB(34, 34, 34) },
+    
+        ConfigurationSaving = { Enabled = false }
 })
 
 local TabSmart = Window:CreateTab("Smart Connection", 4483362458)
