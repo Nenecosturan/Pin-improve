@@ -1,9 +1,9 @@
--- ping gelistirici script deneme surumu 2.0 ==========================================
--- 0. AUTO-EXECUTE (PEŞİMİZİ BIRAKMAYAN SCRIPT)
+-- ping gelistirici script deneme surumu 2.5 ==========================================
+-- 0. AUTO-EXECUTE
 -- ==========================================
 local scriptSource = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/Nenecosturan/Pin-improve/main/Main.lua'))()]]
 if queue_on_teleport then
-    queue_on_teleport(scriptSource)
+    pcall(function() queue_on_teleport(scriptSource) end)
 end
 
 -- ==========================================
@@ -18,17 +18,17 @@ local LocalPlayer = Players.LocalPlayer
 local PlaceId = game.PlaceId 
 
 -- ==========================================
--- 2. GELİŞMİŞ BYPASS VE BÖLGE KONTROL FONKSİYONU
+-- 2. GELİŞMİŞ BYPASS VE BÖLGE KONTROLÜ
 -- ==========================================
 local function ForceRegionHop(targetRegionName)
-    Rayfield:Notify({Title = "Server Check...", Content = targetRegionName .. "route being scanned...", Duration = 3})
+    Rayfield:Notify({Title = "Server Check...", Content = targetRegionName .. " route being scanned...", Duration = 3})
     
     local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
     local success, result = pcall(function()
         return HttpService:JSONDecode(game:HttpGet(url))
     end)
 
-    if success and result.data then
+    if success and result and result.data then
         local foundServer = nil
         for _, server in ipairs(result.data) do
             if server.id ~= game.JobId and server.playing < server.maxPlayers then
@@ -43,12 +43,12 @@ local function ForceRegionHop(targetRegionName)
         else
             Rayfield:Notify({
                 Title = "❌UNSUPPORTED ROUTE❌", 
-                Content = "Sorry!, " .. targetRegionName .. " route is not avaible for this game,try another route.", 
-                Duration = 6
+                Content = "Sorry! " .. targetRegionName .. " route is not available.", 
+                Duration = 5
             })
         end
     else
-        Rayfield:Notify({Title = "ERROR", Content = "Server list is not avaible, We will fix this ASAP.", Duration = 4})
+        Rayfield:Notify({Title = "ERROR", Content = "Server list is not available.", Duration = 4})
     end
 end
 
@@ -59,7 +59,7 @@ local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect |-ZENITH-",
     LoadingTitle = "ANALYZING SOURCE...",
     LoadingSubtitle = "Loading Sources",
-    Theme = "DarkBlue", 
+    Theme = "DarkBlue", -- Sende çalıştığı için korundu!
     ConfigurationSaving = { Enabled = false }
 })
 
@@ -78,8 +78,9 @@ local PingLabel = TabSmart:CreateLabel("Ping Analiz Ediliyor...")
 task.spawn(function()
     while task.wait(1) do
         pcall(function()
-            local ping = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-            -- BURADA TIRNAK HATASI DÜZELTİLDİ VE VARSAYILAN DEĞER EKLENDİ
+            local rawPing = Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+            local ping = math.floor(rawPing + 0.5)
+            -- Mantıksal hata ve tırnak hatası tamamen giderildi:
             local color = (ping < 61 and "🔵") or (ping < 100 and "🟢") or (ping < 150 and "🟡") or (ping < 200 and "🔴") or "💀"
             PingLabel:Set("Live Ping: " .. ping .. " ms | Quality: " .. color)
         end)
@@ -88,20 +89,18 @@ end)
 
 TabSmart:CreateButton({
     Name = "⚡•Auto-Connect fastest•⚡",
-    Callback = function()
-        ForceRegionHop("Best Server")
-    end
+    Callback = function() ForceRegionHop("Best Server") end
 })
 
 -- ==========================================
--- 5. MANUEL ROUTES (HATA MESAJLI BYPASS)
+-- 5. MANUEL ROUTES
 -- ==========================================
 TabManual:CreateButton({Name = "• Germany / Holland • 🇩🇪", Callback = function() ForceRegionHop("Almanya") end})
 TabManual:CreateButton({Name = "• France / Spain • 🇫🇷", Callback = function() ForceRegionHop("Fransa") end})
 TabManual:CreateButton({Name = "• Romania / Greece • 🇷🇴", Callback = function() ForceRegionHop("Romanya") end})
 
 -- ==========================================
--- 6. SERVER BROWSER (KAPASİTE VE YENİLEME)
+-- 6. SERVER BROWSER
 -- ==========================================
 TabBrowser:CreateButton({
     Name = "🔄• SCAN & REFRESH SERVERS •🔄",
@@ -111,7 +110,7 @@ TabBrowser:CreateButton({
             return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Asc&limit=10"))
         end)
 
-        if success and result.data then
+        if success and result and result.data then
             for i, v in ipairs(result.data) do
                 local current = v.playing
                 local max = v.maxPlayers
@@ -120,9 +119,6 @@ TabBrowser:CreateButton({
                 TabBrowser:CreateButton({
                     Name = "Server #"..i.." | 👥 " .. current .. "/" .. max .. " [" .. status .. "]",
                     Callback = function()
-                        if current >= max then
-                            Rayfield:Notify({Title = "Full!", Content = "Server is full, Roblox will get you on line.", Duration = 3})
-                        end
                         TeleportService:TeleportToPlaceInstance(PlaceId, v.id, LocalPlayer)
                     end
                 })
@@ -132,12 +128,9 @@ TabBrowser:CreateButton({
 })
 
 -- ==========================================
--- 7. GAME SUPPORT & AYARLAR
+-- 7. AYARLAR
 -- ==========================================
-TabSupport:CreateParagraph({
-    Title = "Game Info & version", 
-    Content = "Current Game ID: " .. PlaceId .. "\nVersion: 2.5"
-})
+TabSupport:CreateParagraph({Title = "Game Info", Content = "ID: " .. PlaceId .. "\nVersion: 2.5"})
 
 TabSettings:CreateToggle({
     Name = "Ping Spike Protection (auto-hop)",
@@ -159,45 +152,17 @@ TabSettings:CreateSlider({
     Range = {1, 10},
     Increment = 1,
     CurrentValue = 10,
-    Callback = function(Value)
-        settings().Rendering.QualityLevel = Value
-    end
+    Callback = function(Value) settings().Rendering.QualityLevel = Value end
 })
 
 -- ==========================================
--- 8. YEDEK SİSTEM (CUSTOM UI BACKUP)
+-- 8. YEDEK SİSTEM
 -- ==========================================
-TabBackup:CreateParagraph({
-    Title = "Our Backup Script", 
-    Content = "Our backup Ping optimization script made by the creator of this script ZENITH."
-})
-
 TabBackup:CreateButton({
     Name = "🚀(•PIOP• - Backup)🚀",
     Callback = function()
-        Rayfield:Notify({
-            Title = "Backup system loaded!", 
-            Content = "Sources Loaded...", 
-            Duration = 3
-        })
-        
-        local success, err = pcall(function()
+        pcall(function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/Nenecosturan/Ping-Optimizer-PIOP-/refs/heads/main/Main.lua"))()
         end)
-        
-        if not success then
-            Rayfield:Notify({
-                Title = "Error While Loading!", 
-                Content = "REASON: " .. tostring(err), 
-                Duration = 9
-            })
-        end
     end
 })
-. tostring(err), 
-                Duration = 9.5
-            })
-        end
-    end
-})
-
