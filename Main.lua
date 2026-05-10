@@ -22,7 +22,7 @@ local PlaceId = game.PlaceId
 -- 2. GELİŞMİŞ BYPASS VE BÖLGE KONTROL FONKSİYONU
 -- ==========================================
 local function ForceRegionHop(targetRegionName)
-    Rayfield:Notify({Title = "Bölge Kontrolü", Content = targetRegionName .. " rotası taranıyor...", Duration = 3})
+    Rayfield:Notify({Title = "Server Check...", Content = targetRegionName .. " route being scanned...", Duration = 3})
     
     local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
     local success, result = pcall(function()
@@ -40,18 +40,18 @@ local function ForceRegionHop(targetRegionName)
         end
 
         if foundServer then
-            Rayfield:Notify({Title = "Success!", Content = "Hedef bölgeye zorunlu geçiş yapılıyor...", Duration = 3})
+            Rayfield:Notify({Title = "Success!", Content = "Connecting To The Route...", Duration = 3})
             TeleportService:TeleportToPlaceInstance(PlaceId, foundServer, LocalPlayer)
         else
             -- EĞER FARKLI SUNUCU BULUNAMAZSA (DESTEKLENMİYOR DEMEKTİR)
             Rayfield:Notify({
-                Title = "❌ Bölge Desteklenmiyor", 
-                Content = "Üzgünüm dostum, " .. targetRegionName .. " rotası bu oyunda şu an mevcut değil. Lütfen başka bir rota deneyin!", 
+                Title = "❌UNSUPPORTED ROUTE❌", 
+                Content = "Sorry!, " .. targetRegionName .. " route is not avaible for this game,try another route.", 
                 Duration = 6
             })
         end
     else
-        Rayfield:Notify({Title = "Hata", Content = "Sunucu listesine erişilemedi. Anti-Cheat engeli olabilir.", Duration = 4})
+        Rayfield:Notify({Title = "ERROR", Content = "Server list is not avaible, We will fix this ASAP.", Duration = 4})
     end
 end
 
@@ -60,18 +60,18 @@ end
 -- ==========================================
 local Window = Rayfield:CreateWindow({
     Name = "•PIOP• Connect |-ZENITH-",
-    LoadingTitle = "BYPASSING PROTOCOLS...",
-    LoadingSubtitle = "Persistent Script Mode Active",
+    LoadingTitle = "ANALYZING SOURCE...",
+    LoadingSubtitle = "Loading Sources",
     Theme = "DarkBlue", -- İstediğin o koyu mavi tema!
     ConfigurationSaving = { Enabled = false }
 })
 
-local TabSmart = Window:CreateTab("Smart Connect", 4483362458)
-local TabManual = Window:CreateTab("Manual Routes", 4483362458)
-local TabBrowser = Window:CreateTab("Server Browser", 4483362458)
-local TabSupport = Window:CreateTab("Game Support", 4483362458)
-local TabSettings = Window:CreateTab("Ayarlar", 4483362458)
-local TabBackup = Window:CreateTab("Backup Script",4483362458)
+local TabSmart = Window:CreateTab("Smart Connect", 6031265971)
+local TabManual = Window:CreateTab("Manual Routes", 6031289993)
+local TabBrowser = Window:CreateTab("Server Browser", 6031280951)
+local TabSupport = Window:CreateTab("Game Info & Version", 6031154887)
+local TabSettings = Window:CreateTab("Ayarlar", 6031280793)
+local TabBackup = Window:CreateTab("Backup Script", 6034287525)
 -- ==========================================
 -- 4. SMART CONNECT & CANLI PİNG
 -- ==========================================
@@ -81,16 +81,16 @@ task.spawn(function()
     while task.wait(1) do
         pcall(function()
             local ping = math.round(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
-            local color = ping < 100 and "🔵" or ping < 200 and "🟡" or "🔴"
+            local color = ping < 61 and "🔵" or ping < 100 and "🟢" or ping < 150 and "🟡" or ping < 200 and "🔴)
             PingLabel:Set("Live Ping: " .. ping .. " ms | Quality: " .. color)
         end)
     end
 end)
 
 TabSmart:CreateButton({
-    Name = "⚡ Smart Bypass & Auto-Connect ⚡",
+    Name = "⚡•Auto-Connect fastest•⚡",
     Callback = function()
-        ForceRegionHop("En İyi Sunucu")
+        ForceRegionHop("Best Server")
     end
 })
 
@@ -105,7 +105,7 @@ TabManual:CreateButton({Name = "• Romania / Greece • 🇷🇴", Callback = f
 -- 6. SERVER BROWSER (KAPASİTE VE YENİLEME)
 -- ==========================================
 TabBrowser:CreateButton({
-    Name = "🔄 SCAN & REFRESH SERVERS",
+    Name = "🔄• SCAN & REFRESH SERVERS •🔄",
     Callback = function()
         Rayfield:Notify({Title = "Scanning...", Content = "Sunucu kapasiteleri inceleniyor...", Duration = 2})
         local success, result = pcall(function()
@@ -122,7 +122,7 @@ TabBrowser:CreateButton({
                     Name = "Server #"..i.." | 👥 " .. current .. "/" .. max .. " [" .. status .. "]",
                     Callback = function()
                         if current >= max then
-                            Rayfield:Notify({Title = "Dolu!", Content = "Sunucu dolu, Roblox sizi sıraya alabilir.", Duration = 3})
+                            Rayfield:Notify({Title = "Full!", Content = "Server is full, Roblox will get you on line.", Duration = 3})
                         end
                         TeleportService:TeleportToPlaceInstance(PlaceId, v.id, LocalPlayer)
                     
@@ -137,19 +137,19 @@ TabBrowser:CreateButton({
 -- 7. GAME SUPPORT & AYARLAR
 -- ==========================================
 TabSupport:CreateParagraph({
-    Title = "Region Support Info", 
-    Content = "Current Game ID: " .. PlaceId .. "\nStatus: Secure Bypass Active\nSunucu bulunamazsa 'Bölge Desteklenmiyor' uyarısı alırsınız."
+    Title = "Game Info & version", 
+    Content = "Current Game ID: " .. PlaceId .. "\nVersion:2.5"
 })
 
 TabSettings:CreateToggle({
-    Name = "Oto-Bypass (Yüksek Ping Koruması)",
+    Name = "Ping Spike Protection (auto-hop)",
     CurrentValue = false,
     Callback = function(Value)
         _G.AutoHop = Value
         task.spawn(function()
             while _G.AutoHop do
                 local ping = Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
-                if ping > 300 then ForceRegionHop("Otomatik") break end
+                if ping > 300 then ForceRegionHop("auto-hopping") break end
                 task.wait(10)
             end
         end)
@@ -169,17 +169,17 @@ TabSettings:CreateSlider({
 -- 8. YEDEK SİSTEM (CUSTOM UI BACKUP)
 -- ==========================================
 TabBackup:CreateParagraph({
-    Title = "Custom UI Backup", 
-    Content = "Ana sistemden bağımsız, kendi özel arayüzümüze (Custom Menu) sahip yedek optimizasyon scriptini buradan başlatabilirsin."
+    Title = "Our Backup Script", 
+    Content = "Our backup Ping optimization script made by the creator of this script ZENITH."
 })
 
 TabBackup:CreateButton({
-    Name = "🚀 Custom Menu Başlat (PIOP- Backup)",
+    Name = "🚀(•PIOP• - Backup)🚀",
     Callback = function()
         Rayfield:Notify({
-            Title = "Yedek Sistem Aktif!", 
-            Content = "Kendi özel menün yükleniyor...", 
-            Duration = 4
+            Title = "Backup system loaded!", 
+            Content = "Sources Loaded...", 
+            Duration = 3
         })
         
         -- Senin verdiğin Raw linkini çalıştıran komut (Rayfield'ı kapatmaz)
@@ -189,9 +189,9 @@ TabBackup:CreateButton({
         
         if not success then
             Rayfield:Notify({
-                Title = "Yükleme Hatası!", 
-                Content = "Script yüklenirken bir sorun oluştu: " .. tostring(err), 
-                Duration = 5
+                Title = "Error While Loading!", 
+                Content = "ESTIMATED REASON:Script might be deleted & the RAW link might doesnt work anymore & Script might be under development " .. tostring(err), 
+                Duration = 9.5
             })
         end
     end
